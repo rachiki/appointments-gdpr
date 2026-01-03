@@ -41,7 +41,7 @@ export const translations = {
     instantConfirmationDescription: 'Get your booking code immediately',
     flexibleScheduling: 'Flexible Scheduling',
     flexibleSchedulingDescription: 'Book up to 4 weeks ahead',
-    footerCopyright: '© 2024 Appointment Booking System. All rights reserved.',
+    footerCopyright: '© 2024 Appointment Booking System.',
 
     // Book Page
     bookAppointment: 'Book Appointment',
@@ -204,7 +204,7 @@ export const translations = {
     instantConfirmationDescription: 'Erhalten Sie Ihren Buchungscode sofort',
     flexibleScheduling: 'Flexible Planung',
     flexibleSchedulingDescription: 'Buchen Sie bis zu 4 Wochen im Voraus',
-    footerCopyright: '© 2024 Terminvergabe-System. Alle Rechte vorbehalten.',
+    footerCopyright: '© 2024 Terminvergabe-System.',
 
     // Book Page
     bookAppointment: 'Termin buchen',
