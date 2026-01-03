@@ -1,11 +1,3 @@
-## Ideas for improvement
-1. Simple login for employees (single pw is enough)
-2. Remove all personal data fields, instead do registration with any string (a secret_id)
-2.1 See your appointments when entering your secret_id, delete appointments there
-3 Block limited number of appointments for a timeslot
-4. Set the default number of timeslots for each weekday and slot 
-5. Translate to german
-
 # Purpose
 This is a repo for scheduling appointments in a very simple way, that should not be affected by any GDPR requirements as the only info needed for booking is any string and a timeslot (no guarantees here!).
 

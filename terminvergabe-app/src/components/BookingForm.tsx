@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useApp } from '@/context/AppContext';
+import { useLanguage } from '@/context/LanguageContext';
 import { formatDate } from '@/config/schedule';
 import { Appointment } from '@/types';
 
@@ -14,6 +15,7 @@ interface BookingFormProps {
 
 export default function BookingForm({ selectedDate, selectedTime, onSuccess, onBack }: BookingFormProps) {
   const { addAppointment } = useApp();
+  const { t, language } = useLanguage();
   const [secretId, setSecretId] = useState('');
   const [errors, setErrors] = useState<{ secretId?: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -22,9 +24,9 @@ export default function BookingForm({ selectedDate, selectedTime, onSuccess, onB
     const newErrors: { secretId?: string } = {};
 
     if (!secretId.trim()) {
-      newErrors.secretId = 'Secret ID is required';
+      newErrors.secretId = t('secretIdRequired');
     } else if (secretId.trim().length < 3) {
-      newErrors.secretId = 'Secret ID must be at least 3 characters';
+      newErrors.secretId = t('secretIdMinLength');
     }
 
     setErrors(newErrors);
@@ -62,7 +64,7 @@ export default function BookingForm({ selectedDate, selectedTime, onSuccess, onB
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
-        <h3 className="text-lg font-semibold text-primary-900">Enter Your Secret ID</h3>
+        <h3 className="text-lg font-semibold text-primary-900">{t('enterYourSecretId')}</h3>
       </div>
 
       {/* Selected Date/Time Summary */}
@@ -74,7 +76,7 @@ export default function BookingForm({ selectedDate, selectedTime, onSuccess, onB
             </svg>
           </div>
           <div>
-            <p className="font-semibold text-primary-900">{formatDate(selectedDate)}</p>
+            <p className="font-semibold text-primary-900">{formatDate(selectedDate, language)}</p>
             <p className="text-accent-600 font-medium">{selectedTime}</p>
           </div>
         </div>
@@ -87,8 +89,8 @@ export default function BookingForm({ selectedDate, selectedTime, onSuccess, onB
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <div className="text-sm text-primary-700">
-            <p className="font-medium mb-1">What is a Secret ID?</p>
-            <p>Choose any memorable phrase or code that you&apos;ll use to view and manage your appointments. Keep it private!</p>
+            <p className="font-medium mb-1">{t('whatIsSecretId')}</p>
+            <p>{t('secretIdExplanation')}</p>
           </div>
         </div>
       </div>
@@ -97,14 +99,14 @@ export default function BookingForm({ selectedDate, selectedTime, onSuccess, onB
         {/* Secret ID */}
         <div>
           <label htmlFor="secretId" className="label">
-            Your Secret ID <span className="text-danger-500">*</span>
+            {t('yourSecretId')} <span className="text-danger-500">*</span>
           </label>
           <input
             type="text"
             id="secretId"
             value={secretId}
             onChange={(e) => setSecretId(e.target.value)}
-            placeholder="Enter a memorable secret code"
+            placeholder={t('enterMemorableCode')}
             className={`input ${errors.secretId ? 'border-danger-500 focus:border-danger-500 focus:ring-danger-500/20' : ''}`}
             autoComplete="off"
           />
@@ -112,7 +114,7 @@ export default function BookingForm({ selectedDate, selectedTime, onSuccess, onB
             <p className="text-danger-500 text-sm mt-1.5">{errors.secretId}</p>
           )}
           <p className="text-slate-500 text-xs mt-1.5">
-            Use this same ID later to view or cancel your appointments
+            {t('useSecretIdLater')}
           </p>
         </div>
 
@@ -128,11 +130,11 @@ export default function BookingForm({ selectedDate, selectedTime, onSuccess, onB
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
               </svg>
-              Booking...
+              {t('booking')}
             </>
           ) : (
             <>
-              Confirm Booking
+              {t('confirmBooking')}
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>

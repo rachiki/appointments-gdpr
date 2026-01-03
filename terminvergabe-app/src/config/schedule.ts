@@ -1,4 +1,5 @@
 import { OpeningHours, SlotConfig } from '@/types';
+import { Language } from '@/i18n/translations';
 
 // Default slot duration in minutes
 export const SLOT_DURATION = 30;
@@ -65,15 +66,19 @@ export function generateTimeSlots(openingHours: OpeningHours): string[] {
 }
 
 // Get day name
-export function getDayName(dayOfWeek: number): string {
-  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  return days[dayOfWeek];
+export function getDayName(dayOfWeek: number, language: Language = 'de'): string {
+  const days = {
+    en: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+    de: ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'],
+  };
+  return days[language][dayOfWeek];
 }
 
 // Format date for display
-export function formatDate(dateString: string): string {
+export function formatDate(dateString: string, language: Language = 'de'): string {
   const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', {
+  const locale = language === 'de' ? 'de-DE' : 'en-US';
+  return date.toLocaleDateString(locale, {
     weekday: 'long',
     year: 'numeric',
     month: 'long',

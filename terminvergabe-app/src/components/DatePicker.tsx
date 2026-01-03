@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useApp } from '@/context/AppContext';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface DatePickerProps {
   selectedDate: string | null;
@@ -10,6 +11,7 @@ interface DatePickerProps {
 
 export default function DatePicker({ selectedDate, onSelectDate }: DatePickerProps) {
   const { isDateOpen } = useApp();
+  const { t, language } = useLanguage();
   const [currentMonth, setCurrentMonth] = useState(() => {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
@@ -71,12 +73,16 @@ export default function DatePicker({ selectedDate, onSelectDate }: DatePickerPro
   };
 
   const days = getDaysInMonth(currentMonth);
-  const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const weekDays = language === 'de' 
+    ? [t('mon'), t('tue'), t('wed'), t('thu'), t('fri'), t('sat'), t('sun')]
+    : [t('mon'), t('tue'), t('wed'), t('thu'), t('fri'), t('sat'), t('sun')];
 
   const canGoPrev = () => {
     const now = new Date();
     return currentMonth > new Date(now.getFullYear(), now.getMonth(), 1);
   };
+
+  const locale = language === 'de' ? 'de-DE' : 'en-US';
 
   return (
     <div className="card p-6">
@@ -92,7 +98,7 @@ export default function DatePicker({ selectedDate, onSelectDate }: DatePickerPro
           </svg>
         </button>
         <h3 className="text-lg font-semibold text-primary-900">
-          {currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+          {currentMonth.toLocaleDateString(locale, { month: 'long', year: 'numeric' })}
         </h3>
         <button
           onClick={nextMonth}
@@ -155,18 +161,17 @@ export default function DatePicker({ selectedDate, onSelectDate }: DatePickerPro
       <div className="mt-6 pt-4 border-t border-slate-100 flex flex-wrap gap-4 text-xs text-slate-500">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded bg-accent-500"></div>
-          <span>Selected</span>
+          <span>{t('selected')}</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded ring-2 ring-accent-300"></div>
-          <span>Today</span>
+          <span>{t('today')}</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded bg-slate-200"></div>
-          <span>Unavailable</span>
+          <span>{t('unavailable')}</span>
         </div>
       </div>
     </div>
   );
 }
-

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { DM_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { AppProvider } from "@/context/AppContext";
+import { LanguageProvider } from "@/context/LanguageContext";
 
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
@@ -26,11 +27,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="de">
       <body className={`${dmSans.variable} ${jetbrainsMono.variable} font-sans`}>
-        <AppProvider>
-          {children}
-        </AppProvider>
+        <LanguageProvider>
+          <AppProvider>
+            {children}
+          </AppProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

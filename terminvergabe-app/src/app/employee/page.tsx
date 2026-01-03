@@ -3,7 +3,9 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useApp } from '@/context/AppContext';
+import { useLanguage } from '@/context/LanguageContext';
 import { formatDate, getNextDays, DEFAULT_OPENING_HOURS, generateTimeSlots, getDayName } from '@/config/schedule';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export default function EmployeePage() {
   const { 
@@ -21,6 +23,7 @@ export default function EmployeePage() {
     slotConfig,
     updateSlotConfig,
   } = useApp();
+  const { t, language } = useLanguage();
 
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
@@ -70,7 +73,7 @@ export default function EmployeePage() {
       setLoginError('');
       setPassword('');
     } else {
-      setLoginError('Invalid password');
+      setLoginError(t('invalidPassword'));
     }
   };
 
@@ -112,10 +115,11 @@ export default function EmployeePage() {
                 </svg>
               </div>
               <div>
-                <h1 className="text-xl font-semibold">Employee Dashboard</h1>
-                <p className="text-primary-200 text-sm">Login Required</p>
+                <h1 className="text-xl font-semibold">{t('employeeDashboard')}</h1>
+                <p className="text-primary-200 text-sm">{t('loginRequired')}</p>
               </div>
             </Link>
+            <LanguageSwitcher variant="minimal" />
           </div>
         </header>
 
@@ -129,19 +133,19 @@ export default function EmployeePage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                   </svg>
                 </div>
-                <h2 className="text-2xl font-bold text-primary-900">Employee Login</h2>
-                <p className="text-slate-600 mt-2">Enter your password to access the dashboard</p>
+                <h2 className="text-2xl font-bold text-primary-900">{t('employeeLogin')}</h2>
+                <p className="text-slate-600 mt-2">{t('enterPasswordToAccess')}</p>
               </div>
 
               <form onSubmit={handleLogin} className="space-y-4">
                 <div>
-                  <label htmlFor="password" className="label">Password</label>
+                  <label htmlFor="password" className="label">{t('password')}</label>
                   <input
                     type="password"
                     id="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter employee password"
+                    placeholder={t('enterEmployeePassword')}
                     className={`input ${loginError ? 'border-danger-500' : ''}`}
                     autoComplete="current-password"
                   />
@@ -153,13 +157,13 @@ export default function EmployeePage() {
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                   </svg>
-                  Login
+                  {t('login')}
                 </button>
               </form>
 
               <div className="mt-6 text-center">
                 <Link href="/" className="text-slate-500 hover:text-slate-700 text-sm">
-                  ← Back to Home
+                  {t('backToHome')}
                 </Link>
               </div>
             </div>
@@ -169,7 +173,7 @@ export default function EmployeePage() {
         {/* Footer */}
         <footer className="bg-primary-900 text-primary-200 py-6 px-6">
           <div className="max-w-7xl mx-auto text-center text-sm">
-            <p>© 2024 Appointment Booking System. Employee Portal.</p>
+            <p>{t('footerCopyright').replace('All rights reserved.', t('employeePortal')).replace('Alle Rechte vorbehalten.', t('employeePortal'))}</p>
           </div>
         </footer>
       </div>
@@ -189,23 +193,24 @@ export default function EmployeePage() {
               </svg>
             </div>
             <div>
-              <h1 className="text-xl font-semibold">Employee Dashboard</h1>
-              <p className="text-primary-200 text-sm">Manage Appointments</p>
+              <h1 className="text-xl font-semibold">{t('employeeDashboard')}</h1>
+              <p className="text-primary-200 text-sm">{t('manageAppointments')}</p>
             </div>
           </Link>
           <div className="flex items-center gap-3">
+            <LanguageSwitcher variant="minimal" />
             <button onClick={() => setShowConfigModal(true)} className="btn btn-ghost text-white hover:bg-white/10">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
-              Settings
+              {t('settings')}
             </button>
             <button onClick={employeeLogout} className="btn btn-ghost text-white hover:bg-white/10">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>
-              Logout
+              {t('logout')}
             </button>
           </div>
         </div>
@@ -221,7 +226,7 @@ export default function EmployeePage() {
               </svg>
             </div>
             <div>
-              <p className="text-xs text-slate-500">Selected Day</p>
+              <p className="text-xs text-slate-500">{t('selectedDay')}</p>
               <p className="text-xl font-bold text-primary-900">{todayAppointments}</p>
             </div>
           </div>
@@ -232,7 +237,7 @@ export default function EmployeePage() {
               </svg>
             </div>
             <div>
-              <p className="text-xs text-slate-500">Total Bookings</p>
+              <p className="text-xs text-slate-500">{t('totalBookings')}</p>
               <p className="text-xl font-bold text-primary-900">{totalAppointments}</p>
             </div>
           </div>
@@ -243,7 +248,7 @@ export default function EmployeePage() {
               </svg>
             </div>
             <div>
-              <p className="text-xs text-slate-500">Blocked Slots</p>
+              <p className="text-xs text-slate-500">{t('blockedSlots')}</p>
               <p className="text-xl font-bold text-primary-900">{blockedSlots.length}</p>
             </div>
           </div>
@@ -257,7 +262,7 @@ export default function EmployeePage() {
             {/* Date Selector */}
             <div className="lg:col-span-1">
               <div className="card p-4 sticky top-6">
-                <h3 className="font-semibold text-primary-900 mb-4">Select Date</h3>
+                <h3 className="font-semibold text-primary-900 mb-4">{t('selectDate')}</h3>
                 <div className="max-h-96 overflow-y-auto space-y-1">
                   {dates.map(date => {
                     const dateAppointments = appointments.filter(apt => apt.date === date).length;
@@ -275,7 +280,7 @@ export default function EmployeePage() {
                         <div className="flex items-center justify-between">
                           <div>
                             <p className={`font-medium ${isSelected ? 'text-white' : 'text-primary-900'}`}>
-                              {new Date(date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                              {new Date(date).toLocaleDateString(language === 'de' ? 'de-DE' : 'en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
                             </p>
                           </div>
                           {dateAppointments > 0 && (
@@ -298,8 +303,8 @@ export default function EmployeePage() {
               {/* Day Header */}
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-2xl font-bold text-primary-900">{formatDate(selectedDate)}</h2>
-                  <p className="text-slate-500">{dayAppointments.length} appointments, {dayBlockedSlots.length} blocked slots</p>
+                  <h2 className="text-2xl font-bold text-primary-900">{formatDate(selectedDate, language)}</h2>
+                  <p className="text-slate-500">{dayAppointments.length} {t('appointmentsCount')}, {dayBlockedSlots.length} {t('blockedSlotsCount')}</p>
                 </div>
                 <button
                   onClick={() => setShowBlockModal(true)}
@@ -308,21 +313,21 @@ export default function EmployeePage() {
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                   </svg>
-                  Block Time Slot
+                  {t('blockTimeSlot')}
                 </button>
               </div>
 
               {/* Appointments List */}
               <div className="card">
                 <div className="p-4 border-b border-slate-100">
-                  <h3 className="font-semibold text-primary-900">Appointments</h3>
+                  <h3 className="font-semibold text-primary-900">{t('appointments')}</h3>
                 </div>
                 {dayAppointments.length === 0 ? (
                   <div className="p-8 text-center text-slate-500">
                     <svg className="w-12 h-12 mx-auto mb-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    <p>No appointments for this date</p>
+                    <p>{t('noAppointmentsForDate')}</p>
                   </div>
                 ) : (
                   <div className="divide-y divide-slate-100">
@@ -333,7 +338,7 @@ export default function EmployeePage() {
                             <span className="text-lg font-bold text-accent-600">{apt.time}</span>
                           </div>
                           <div>
-                            <p className="font-medium text-primary-900">Secret ID: <span className="font-mono text-primary-600">{apt.secretId}</span></p>
+                            <p className="font-medium text-primary-900">{t('secretIdDisplay')}: <span className="font-mono text-primary-600">{apt.secretId}</span></p>
                             <p className="text-xs text-slate-400 font-mono mt-1">{apt.id}</p>
                           </div>
                         </div>
@@ -344,20 +349,20 @@ export default function EmployeePage() {
                                 onClick={() => handleCancelAppointment(apt.id)}
                                 className="btn btn-danger text-sm py-1.5"
                               >
-                                Confirm
+                                {t('confirm')}
                               </button>
                               <button
                                 onClick={() => setConfirmCancel(null)}
                                 className="btn btn-ghost text-sm py-1.5"
                               >
-                                Keep
+                                {t('keep')}
                               </button>
                             </div>
                           ) : (
                             <button
                               onClick={() => setConfirmCancel(apt.id)}
                               className="text-danger-500 hover:text-danger-700 p-2 rounded-lg hover:bg-danger-50 transition-colors"
-                              title="Cancel appointment"
+                              title={t('cancelAppointment')}
                             >
                               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -375,7 +380,7 @@ export default function EmployeePage() {
               {dayBlockedSlots.length > 0 && (
                 <div className="card">
                   <div className="p-4 border-b border-slate-100">
-                    <h3 className="font-semibold text-primary-900">Blocked Slots</h3>
+                    <h3 className="font-semibold text-primary-900">{t('blockedSlots')}</h3>
                   </div>
                   <div className="divide-y divide-slate-100">
                     {dayBlockedSlots.map(slot => (
@@ -385,14 +390,14 @@ export default function EmployeePage() {
                             <span className="text-lg font-bold text-danger-600">{slot.time}</span>
                           </div>
                           <div>
-                            <p className="font-medium text-danger-700">Blocked</p>
+                            <p className="font-medium text-danger-700">{t('blocked')}</p>
                             {slot.reason && <p className="text-sm text-danger-500">{slot.reason}</p>}
                           </div>
                         </div>
                         <button
                           onClick={() => unblockSlot(slot.id)}
                           className="text-danger-600 hover:text-danger-800 p-2 rounded-lg hover:bg-danger-100 transition-colors"
-                          title="Unblock slot"
+                          title={t('unblockSlot')}
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -407,7 +412,7 @@ export default function EmployeePage() {
               {/* Slot Availability Overview */}
               <div className="card">
                 <div className="p-4 border-b border-slate-100">
-                  <h3 className="font-semibold text-primary-900">Slot Availability</h3>
+                  <h3 className="font-semibold text-primary-900">{t('slotAvailability')}</h3>
                 </div>
                 <div className="p-4">
                   <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
@@ -426,7 +431,7 @@ export default function EmployeePage() {
                       >
                         <div className="font-medium">{slot.time}</div>
                         <div className="text-xs">
-                          {slot.blocked ? 'Blocked' : `${slot.available} left`}
+                          {slot.blocked ? t('blocked') : `${slot.available} ${t('left')}`}
                         </div>
                       </div>
                     ))}
@@ -442,18 +447,18 @@ export default function EmployeePage() {
       {showBlockModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 animate-fade-in">
           <div className="card p-6 w-full max-w-md animate-scale-in">
-            <h3 className="text-xl font-bold text-primary-900 mb-4">Block Time Slot</h3>
-            <p className="text-slate-600 mb-6">Select a time slot to block for {formatDate(selectedDate)}</p>
+            <h3 className="text-xl font-bold text-primary-900 mb-4">{t('blockTimeSlot')}</h3>
+            <p className="text-slate-600 mb-6">{t('blockSlotFor')} {formatDate(selectedDate, language)}</p>
             
             <div className="space-y-4">
               <div>
-                <label className="label">Time Slot</label>
+                <label className="label">{t('timeSlot')}</label>
                 <select
                   value={blockTime}
                   onChange={(e) => setBlockTime(e.target.value)}
                   className="input"
                 >
-                  <option value="">Select a time...</option>
+                  <option value="">{t('selectATimeSlot')}</option>
                   {getAllTimeSlots()
                     .filter(time => !dayBlockedSlots.some(s => s.time === time))
                     .map(time => (
@@ -463,12 +468,12 @@ export default function EmployeePage() {
                 </select>
               </div>
               <div>
-                <label className="label">Reason (optional)</label>
+                <label className="label">{t('reasonOptional')}</label>
                 <input
                   type="text"
                   value={blockReason}
                   onChange={(e) => setBlockReason(e.target.value)}
-                  placeholder="e.g., Meeting, Lunch, etc."
+                  placeholder={t('reasonPlaceholder')}
                   className="input"
                 />
               </div>
@@ -479,14 +484,14 @@ export default function EmployeePage() {
                 onClick={() => setShowBlockModal(false)}
                 className="btn btn-secondary flex-1"
               >
-                Cancel
+                {t('cancel')}
               </button>
               <button
                 onClick={handleBlockSlot}
                 disabled={!blockTime}
                 className="btn btn-danger flex-1"
               >
-                Block Slot
+                {t('blockSlot')}
               </button>
             </div>
           </div>
@@ -497,13 +502,13 @@ export default function EmployeePage() {
       {showConfigModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 animate-fade-in">
           <div className="card p-6 w-full max-w-lg animate-scale-in max-h-[80vh] overflow-y-auto">
-            <h3 className="text-xl font-bold text-primary-900 mb-4">Slot Configuration</h3>
-            <p className="text-slate-600 mb-6">Set the number of available appointments per time slot for each weekday</p>
+            <h3 className="text-xl font-bold text-primary-900 mb-4">{t('slotConfiguration')}</h3>
+            <p className="text-slate-600 mb-6">{t('slotConfigDescription')}</p>
             
             <div className="space-y-4">
               {slotConfig.filter(c => DEFAULT_OPENING_HOURS.find(oh => oh.dayOfWeek === c.dayOfWeek)?.isOpen).map(config => (
                 <div key={config.dayOfWeek} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                  <span className="font-medium text-primary-900">{getDayName(config.dayOfWeek)}</span>
+                  <span className="font-medium text-primary-900">{getDayName(config.dayOfWeek, language)}</span>
                   <div className="flex items-center gap-3">
                     <button
                       onClick={() => updateSlotConfig(config.dayOfWeek, Math.max(1, config.slotsPerTime - 1))}
@@ -532,7 +537,7 @@ export default function EmployeePage() {
                 onClick={() => setShowConfigModal(false)}
                 className="btn btn-primary flex-1"
               >
-                Done
+                {t('done')}
               </button>
             </div>
           </div>
@@ -542,7 +547,7 @@ export default function EmployeePage() {
       {/* Footer */}
       <footer className="bg-primary-900 text-primary-200 py-6 px-6">
         <div className="max-w-7xl mx-auto text-center text-sm">
-          <p>© 2024 Appointment Booking System. Employee Portal.</p>
+          <p>{t('footerCopyright').replace('All rights reserved.', t('employeePortal')).replace('Alle Rechte vorbehalten.', t('employeePortal'))}</p>
         </div>
       </footer>
     </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useApp } from '@/context/AppContext';
+import { useLanguage } from '@/context/LanguageContext';
 import { formatDate } from '@/config/schedule';
 import { TimeSlot } from '@/types';
 
@@ -11,8 +12,13 @@ interface TimeSlotPickerProps {
 }
 
 export default function TimeSlotPicker({ selectedDate, selectedTime, onSelectTime }: TimeSlotPickerProps) {
-  const { getAvailableSlots, slotsPerTime } = useApp();
+  const { getAvailableSlots, getSlotsPerTime } = useApp();
+  const { t, language } = useLanguage();
   const slots = getAvailableSlots(selectedDate);
+  
+  const date = new Date(selectedDate);
+  const dayOfWeek = date.getDay();
+  const slotsPerTime = getSlotsPerTime(dayOfWeek);
 
   // Split into morning and afternoon
   const morningSlots = slots.filter(slot => {
@@ -58,11 +64,11 @@ export default function TimeSlotPicker({ selectedDate, selectedTime, onSelectTim
         <div className="text-lg">{slot.time}</div>
         <div className={`text-xs mt-1 ${isSelected ? 'text-white/80' : ''}`}>
           {status === 'blocked' ? (
-            'Blocked'
+            t('blocked')
           ) : status === 'full' ? (
-            'Fully booked'
+            t('fullyBooked')
           ) : (
-            `${slot.available} spots left`
+            `${slot.available} ${t('spotsLeft')}`
           )}
         </div>
       </button>
@@ -72,8 +78,8 @@ export default function TimeSlotPicker({ selectedDate, selectedTime, onSelectTim
   return (
     <div className="card p-6">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold text-primary-900">Select Time</h3>
-        <span className="text-sm text-slate-500">{formatDate(selectedDate)}</span>
+        <h3 className="text-lg font-semibold text-primary-900">{t('selectTime')}</h3>
+        <span className="text-sm text-slate-500">{formatDate(selectedDate, language)}</span>
       </div>
 
       {slots.length === 0 ? (
@@ -81,7 +87,7 @@ export default function TimeSlotPicker({ selectedDate, selectedTime, onSelectTim
           <svg className="w-12 h-12 mx-auto mb-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <p>No time slots available for this date</p>
+          <p>{t('noTimeSlotsAvailable')}</p>
         </div>
       ) : (
         <>
@@ -91,7 +97,7 @@ export default function TimeSlotPicker({ selectedDate, selectedTime, onSelectTim
                 <svg className="w-5 h-5 text-warning-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
-                <span className="text-sm font-medium text-slate-600">Morning</span>
+                <span className="text-sm font-medium text-slate-600">{t('morning')}</span>
               </div>
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
                 {morningSlots.map(renderSlot)}
@@ -105,7 +111,7 @@ export default function TimeSlotPicker({ selectedDate, selectedTime, onSelectTim
                 <svg className="w-5 h-5 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                 </svg>
-                <span className="text-sm font-medium text-slate-600">Afternoon</span>
+                <span className="text-sm font-medium text-slate-600">{t('afternoon')}</span>
               </div>
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
                 {afternoonSlots.map(renderSlot)}
@@ -119,18 +125,17 @@ export default function TimeSlotPicker({ selectedDate, selectedTime, onSelectTim
       <div className="mt-6 pt-4 border-t border-slate-100 flex flex-wrap gap-4 text-xs text-slate-500">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded border-2 border-success-500 bg-success-500/20"></div>
-          <span>Available</span>
+          <span>{t('available')}</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded border-2 border-warning-500 bg-warning-500/20"></div>
-          <span>Limited</span>
+          <span>{t('limited')}</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded bg-slate-200"></div>
-          <span>Full</span>
+          <span>{t('full')}</span>
         </div>
       </div>
     </div>
   );
 }
-

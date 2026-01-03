@@ -3,11 +3,14 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useApp } from '@/context/AppContext';
+import { useLanguage } from '@/context/LanguageContext';
 import { formatDate } from '@/config/schedule';
 import { Appointment } from '@/types';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export default function MyAppointmentsPage() {
   const { getAppointmentsBySecretId, cancelAppointment, isLoaded } = useApp();
+  const { t, language } = useLanguage();
   const [secretId, setSecretId] = useState('');
   const [searchedSecretId, setSearchedSecretId] = useState('');
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -57,16 +60,19 @@ export default function MyAppointmentsPage() {
               </svg>
             </div>
             <div>
-              <h1 className="text-xl font-semibold">My Appointments</h1>
-              <p className="text-primary-200 text-sm">View & Manage</p>
+              <h1 className="text-xl font-semibold">{t('myAppointments')}</h1>
+              <p className="text-primary-200 text-sm">{t('viewAndManage')}</p>
             </div>
           </Link>
-          <Link href="/" className="btn btn-ghost text-white hover:bg-white/10">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-            </svg>
-            Home
-          </Link>
+          <div className="flex items-center gap-3">
+            <LanguageSwitcher variant="minimal" />
+            <Link href="/" className="btn btn-ghost text-white hover:bg-white/10">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+              {t('home')}
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -81,20 +87,20 @@ export default function MyAppointmentsPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </div>
-                <h2 className="text-2xl font-bold text-primary-900 mb-2">Find Your Appointments</h2>
-                <p className="text-slate-600">Enter your Secret ID to view and manage your bookings</p>
+                <h2 className="text-2xl font-bold text-primary-900 mb-2">{t('findYourAppointments')}</h2>
+                <p className="text-slate-600">{t('enterSecretIdToView')}</p>
               </div>
 
               <div className="card p-6">
                 <form onSubmit={handleSearch} className="space-y-4">
                   <div>
-                    <label htmlFor="secretId" className="label">Your Secret ID</label>
+                    <label htmlFor="secretId" className="label">{t('yourSecretId')}</label>
                     <input
                       type="text"
                       id="secretId"
                       value={secretId}
                       onChange={(e) => setSecretId(e.target.value)}
-                      placeholder="Enter your secret ID"
+                      placeholder={t('enterYourSecretIdPlaceholder')}
                       className="input"
                       autoComplete="off"
                     />
@@ -107,14 +113,14 @@ export default function MyAppointmentsPage() {
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
-                    Search Appointments
+                    {t('searchAppointments')}
                   </button>
                 </form>
               </div>
 
               <div className="mt-6 text-center">
                 <Link href="/book" className="text-accent-600 hover:text-accent-700 font-medium">
-                  Need to book a new appointment? →
+                  {t('needToBook')} →
                 </Link>
               </div>
             </div>
@@ -122,14 +128,14 @@ export default function MyAppointmentsPage() {
             <div className="animate-fade-in">
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h2 className="text-2xl font-bold text-primary-900">Your Appointments</h2>
-                  <p className="text-slate-600">Secret ID: <span className="font-mono text-primary-600">{searchedSecretId}</span></p>
+                  <h2 className="text-2xl font-bold text-primary-900">{t('yourAppointmentsTitle')}</h2>
+                  <p className="text-slate-600">{t('secretIdLabel')}: <span className="font-mono text-primary-600">{searchedSecretId}</span></p>
                 </div>
                 <button onClick={handleNewSearch} className="btn btn-secondary">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
-                  New Search
+                  {t('newSearch')}
                 </button>
               </div>
 
@@ -140,10 +146,10 @@ export default function MyAppointmentsPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-semibold text-primary-900 mb-2">No Appointments Found</h3>
-                  <p className="text-slate-600 mb-6">We couldn&apos;t find any appointments with this Secret ID.</p>
+                  <h3 className="text-lg font-semibold text-primary-900 mb-2">{t('noAppointmentsFound')}</h3>
+                  <p className="text-slate-600 mb-6">{t('noAppointmentsWithSecretId')}</p>
                   <Link href="/book" className="btn btn-primary">
-                    Book an Appointment
+                    {t('bookAppointmentButton')}
                   </Link>
                 </div>
               ) : (
@@ -158,7 +164,7 @@ export default function MyAppointmentsPage() {
                             </svg>
                           </div>
                           <div>
-                            <p className="font-semibold text-primary-900">{formatDate(apt.date)}</p>
+                            <p className="font-semibold text-primary-900">{formatDate(apt.date, language)}</p>
                             <p className="text-accent-600 font-medium text-lg">{apt.time}</p>
                             <p className="text-xs font-mono text-slate-400 mt-1">{apt.id}</p>
                           </div>
@@ -170,20 +176,20 @@ export default function MyAppointmentsPage() {
                                 onClick={() => handleDelete(apt.id)}
                                 className="btn btn-danger text-sm py-1.5"
                               >
-                                Confirm
+                                {t('confirm')}
                               </button>
                               <button
                                 onClick={() => setConfirmDelete(null)}
                                 className="btn btn-ghost text-sm py-1.5"
                               >
-                                Cancel
+                                {t('cancel')}
                               </button>
                             </div>
                           ) : (
                             <button
                               onClick={() => setConfirmDelete(apt.id)}
                               className="text-danger-500 hover:text-danger-700 p-2 rounded-lg hover:bg-danger-50 transition-colors"
-                              title="Delete appointment"
+                              title={t('deleteAppointment')}
                             >
                               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -197,7 +203,7 @@ export default function MyAppointmentsPage() {
 
                   <div className="text-center pt-4">
                     <Link href="/book" className="text-accent-600 hover:text-accent-700 font-medium">
-                      Book another appointment →
+                      {t('bookAnother')} →
                     </Link>
                   </div>
                 </div>
@@ -210,10 +216,9 @@ export default function MyAppointmentsPage() {
       {/* Footer */}
       <footer className="bg-primary-900 text-primary-200 py-6 px-6">
         <div className="max-w-6xl mx-auto text-center text-sm">
-          <p>© 2024 Appointment Booking System. All rights reserved.</p>
+          <p>{t('footerCopyright')}</p>
         </div>
       </footer>
     </div>
   );
 }
-

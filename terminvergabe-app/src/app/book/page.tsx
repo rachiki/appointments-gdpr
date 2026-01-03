@@ -6,11 +6,14 @@ import DatePicker from '@/components/DatePicker';
 import TimeSlotPicker from '@/components/TimeSlotPicker';
 import BookingForm from '@/components/BookingForm';
 import Confirmation from '@/components/Confirmation';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
+import { useLanguage } from '@/context/LanguageContext';
 import { Appointment } from '@/types';
 
 type Step = 'date' | 'time' | 'form' | 'confirmation';
 
 export default function BookPage() {
+  const { t } = useLanguage();
   const [step, setStep] = useState<Step>('date');
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
@@ -48,10 +51,10 @@ export default function BookPage() {
   };
 
   const steps = [
-    { id: 'date', label: 'Date', number: 1 },
-    { id: 'time', label: 'Time', number: 2 },
-    { id: 'form', label: 'Details', number: 3 },
-    { id: 'confirmation', label: 'Done', number: 4 },
+    { id: 'date', label: t('date'), number: 1 },
+    { id: 'time', label: t('time'), number: 2 },
+    { id: 'form', label: t('details'), number: 3 },
+    { id: 'confirmation', label: t('done'), number: 4 },
   ];
 
   const currentStepIndex = steps.findIndex(s => s.id === step);
@@ -68,18 +71,21 @@ export default function BookPage() {
               </svg>
             </div>
             <div>
-              <h1 className="text-xl font-semibold">Book Appointment</h1>
-              <p className="text-primary-200 text-sm">Terminvergabe</p>
+              <h1 className="text-xl font-semibold">{t('bookAppointment')}</h1>
+              <p className="text-primary-200 text-sm">{t('terminvergabe')}</p>
             </div>
           </Link>
-          {step !== 'confirmation' && (
-            <button
-              onClick={handleStartOver}
-              className="text-sm text-primary-200 hover:text-white transition-colors"
-            >
-              Start Over
-            </button>
-          )}
+          <div className="flex items-center gap-4">
+            <LanguageSwitcher variant="minimal" />
+            {step !== 'confirmation' && (
+              <button
+                onClick={handleStartOver}
+                className="text-sm text-primary-200 hover:text-white transition-colors"
+              >
+                {t('startOver')}
+              </button>
+            )}
+          </div>
         </div>
       </header>
 
@@ -129,8 +135,8 @@ export default function BookPage() {
           {step === 'date' && (
             <div className="animate-fade-in">
               <div className="text-center mb-8">
-                <h2 className="text-2xl font-bold text-primary-900 mb-2">Select a Date</h2>
-                <p className="text-slate-600">Choose your preferred appointment date</p>
+                <h2 className="text-2xl font-bold text-primary-900 mb-2">{t('selectADate')}</h2>
+                <p className="text-slate-600">{t('selectADateDescription')}</p>
               </div>
               <DatePicker
                 selectedDate={selectedDate}
@@ -149,10 +155,10 @@ export default function BookPage() {
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                   </svg>
-                  Change Date
+                  {t('changeDate')}
                 </button>
-                <h2 className="text-2xl font-bold text-primary-900 mb-2">Select a Time</h2>
-                <p className="text-slate-600">Pick an available time slot</p>
+                <h2 className="text-2xl font-bold text-primary-900 mb-2">{t('selectATime')}</h2>
+                <p className="text-slate-600">{t('selectATimeDescription')}</p>
               </div>
               <TimeSlotPicker
                 selectedDate={selectedDate}
@@ -165,8 +171,8 @@ export default function BookPage() {
           {step === 'form' && selectedDate && selectedTime && (
             <div className="animate-fade-in">
               <div className="text-center mb-8">
-                <h2 className="text-2xl font-bold text-primary-900 mb-2">Enter Your Details</h2>
-                <p className="text-slate-600">Complete your booking information</p>
+                <h2 className="text-2xl font-bold text-primary-900 mb-2">{t('enterYourDetails')}</h2>
+                <p className="text-slate-600">{t('enterYourDetailsDescription')}</p>
               </div>
               <BookingForm
                 selectedDate={selectedDate}
@@ -188,10 +194,9 @@ export default function BookPage() {
       {/* Footer */}
       <footer className="bg-primary-900 text-primary-200 py-6 px-6">
         <div className="max-w-6xl mx-auto text-center text-sm">
-          <p>© 2024 Appointment Booking System. All rights reserved.</p>
+          <p>{t('footerCopyright')}</p>
         </div>
       </footer>
     </div>
   );
 }
-

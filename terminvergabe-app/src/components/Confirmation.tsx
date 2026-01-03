@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useLanguage } from '@/context/LanguageContext';
 import { Appointment } from '@/types';
 import { formatDate } from '@/config/schedule';
 
@@ -9,6 +10,8 @@ interface ConfirmationProps {
 }
 
 export default function Confirmation({ appointment }: ConfirmationProps) {
+  const { t, language } = useLanguage();
+
   return (
     <div className="card p-8 text-center animate-scale-in">
       {/* Success Icon */}
@@ -18,21 +21,21 @@ export default function Confirmation({ appointment }: ConfirmationProps) {
         </svg>
       </div>
 
-      <h2 className="text-2xl font-bold text-primary-900 mb-2">Booking Confirmed!</h2>
-      <p className="text-slate-600 mb-8">Your appointment has been successfully booked.</p>
+      <h2 className="text-2xl font-bold text-primary-900 mb-2">{t('bookingConfirmed')}</h2>
+      <p className="text-slate-600 mb-8">{t('appointmentSuccessfullyBooked')}</p>
 
       {/* Confirmation Code */}
       <div className="bg-primary-50 border-2 border-primary-200 rounded-xl p-6 mb-8">
-        <p className="text-sm text-primary-600 mb-2">Your Confirmation Code</p>
+        <p className="text-sm text-primary-600 mb-2">{t('yourConfirmationCode')}</p>
         <p className="text-2xl font-mono font-bold text-primary-900 tracking-wider">
           {appointment.id}
         </p>
-        <p className="text-xs text-primary-500 mt-2">Please save this code for your records</p>
+        <p className="text-xs text-primary-500 mt-2">{t('saveCodeForRecords')}</p>
       </div>
 
       {/* Appointment Details */}
       <div className="bg-slate-50 rounded-xl p-6 mb-8 text-left">
-        <h3 className="font-semibold text-primary-900 mb-4">Appointment Details</h3>
+        <h3 className="font-semibold text-primary-900 mb-4">{t('appointmentDetails')}</h3>
         <div className="space-y-3">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center shadow-sm">
@@ -41,8 +44,8 @@ export default function Confirmation({ appointment }: ConfirmationProps) {
               </svg>
             </div>
             <div>
-              <p className="text-xs text-slate-500">Date</p>
-              <p className="font-medium text-slate-900">{formatDate(appointment.date)}</p>
+              <p className="text-xs text-slate-500">{t('date')}</p>
+              <p className="font-medium text-slate-900">{formatDate(appointment.date, language)}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -52,7 +55,7 @@ export default function Confirmation({ appointment }: ConfirmationProps) {
               </svg>
             </div>
             <div>
-              <p className="text-xs text-slate-500">Time</p>
+              <p className="text-xs text-slate-500">{t('time')}</p>
               <p className="font-medium text-slate-900">{appointment.time}</p>
             </div>
           </div>
@@ -66,8 +69,8 @@ export default function Confirmation({ appointment }: ConfirmationProps) {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
           <div className="text-sm text-warning-600">
-            <p className="font-medium mb-1">Remember your Secret ID!</p>
-            <p>You&apos;ll need it to view or cancel your appointments later.</p>
+            <p className="font-medium mb-1">{t('rememberSecretId')}</p>
+            <p>{t('secretIdNeededLater')}</p>
           </div>
         </div>
       </div>
@@ -75,10 +78,10 @@ export default function Confirmation({ appointment }: ConfirmationProps) {
       {/* Actions */}
       <div className="flex flex-col sm:flex-row gap-3">
         <Link href="/my-appointments" className="btn btn-secondary flex-1">
-          View My Appointments
+          {t('viewMyAppointments')}
         </Link>
         <Link href="/" className="btn btn-primary flex-1">
-          Return Home
+          {t('returnHome')}
         </Link>
       </div>
     </div>
