@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useApp } from '@/context/AppContext';
-import { formatDate, getNextDays, DEFAULT_OPENING_HOURS, generateTimeSlots } from '@/config/schedule';
+import { formatDate, getNextDays, DEFAULT_OPENING_HOURS, generateTimeSlots, getDayName } from '@/config/schedule';
 
 export default function EmployeePage() {
   const { 
@@ -13,17 +13,37 @@ export default function EmployeePage() {
     blockSlot, 
     unblockSlot,
     getAvailableSlots,
-    isDateOpen 
+    isDateOpen,
+    isLoaded,
+    isEmployeeLoggedIn,
+    employeeLogin,
+    employeeLogout,
+    slotConfig,
+    updateSlotConfig,
   } = useApp();
 
+  const [password, setPassword] = useState('');
+  const [loginError, setLoginError] = useState('');
   const [selectedDate, setSelectedDate] = useState<string>(() => {
     const dates = getNextDays(28);
-    return dates.find(d => isDateOpen(d)) || dates[0];
+    return dates[0];
   });
   const [showBlockModal, setShowBlockModal] = useState(false);
+  const [showConfigModal, setShowConfigModal] = useState(false);
   const [blockTime, setBlockTime] = useState('');
   const [blockReason, setBlockReason] = useState('');
   const [confirmCancel, setConfirmCancel] = useState<string | null>(null);
+
+  // Update selectedDate when isDateOpen changes
+  useMemo(() => {
+    if (isLoaded) {
+      const dates = getNextDays(28);
+      const firstOpenDate = dates.find(d => isDateOpen(d));
+      if (firstOpenDate && !isDateOpen(selectedDate)) {
+        setSelectedDate(firstOpenDate);
+      }
+    }
+  }, [isLoaded, isDateOpen, selectedDate]);
 
   const dates = useMemo(() => getNextDays(28).filter(d => isDateOpen(d)), [isDateOpen]);
   const dayAppointments = useMemo(() => 
@@ -44,6 +64,16 @@ export default function EmployeePage() {
     return generateTimeSlots(openingHours);
   };
 
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (employeeLogin(password)) {
+      setLoginError('');
+      setPassword('');
+    } else {
+      setLoginError('Invalid password');
+    }
+  };
+
   const handleBlockSlot = () => {
     if (!blockTime) return;
     blockSlot(selectedDate, blockTime, blockReason || undefined);
@@ -60,6 +90,93 @@ export default function EmployeePage() {
   const totalAppointments = appointments.length;
   const todayAppointments = appointments.filter(apt => apt.date === selectedDate).length;
 
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full"></div>
+      </div>
+    );
+  }
+
+  // Login Screen
+  if (!isEmployeeLoggedIn) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        {/* Header */}
+        <header className="bg-primary-800 text-white py-4 px-6 shadow-lg">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <Link href="/" className="flex items-center gap-4 hover:opacity-80 transition-opacity">
+              <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+              </div>
+              <div>
+                <h1 className="text-xl font-semibold">Employee Dashboard</h1>
+                <p className="text-primary-200 text-sm">Login Required</p>
+              </div>
+            </Link>
+          </div>
+        </header>
+
+        {/* Login Form */}
+        <main className="flex-1 flex items-center justify-center p-6">
+          <div className="w-full max-w-md">
+            <div className="card p-8 animate-fade-in">
+              <div className="text-center mb-8">
+                <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+                <h2 className="text-2xl font-bold text-primary-900">Employee Login</h2>
+                <p className="text-slate-600 mt-2">Enter your password to access the dashboard</p>
+              </div>
+
+              <form onSubmit={handleLogin} className="space-y-4">
+                <div>
+                  <label htmlFor="password" className="label">Password</label>
+                  <input
+                    type="password"
+                    id="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter employee password"
+                    className={`input ${loginError ? 'border-danger-500' : ''}`}
+                    autoComplete="current-password"
+                  />
+                  {loginError && (
+                    <p className="text-danger-500 text-sm mt-1.5">{loginError}</p>
+                  )}
+                </div>
+                <button type="submit" className="btn btn-primary w-full">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                  </svg>
+                  Login
+                </button>
+              </form>
+
+              <div className="mt-6 text-center">
+                <Link href="/" className="text-slate-500 hover:text-slate-700 text-sm">
+                  ← Back to Home
+                </Link>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        {/* Footer */}
+        <footer className="bg-primary-900 text-primary-200 py-6 px-6">
+          <div className="max-w-7xl mx-auto text-center text-sm">
+            <p>© 2024 Appointment Booking System. Employee Portal.</p>
+          </div>
+        </footer>
+      </div>
+    );
+  }
+
+  // Dashboard
   return (
     <div className="min-h-screen flex flex-col bg-slate-100">
       {/* Header */}
@@ -76,12 +193,21 @@ export default function EmployeePage() {
               <p className="text-primary-200 text-sm">Manage Appointments</p>
             </div>
           </Link>
-          <Link href="/" className="btn btn-ghost text-white hover:bg-white/10">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-            </svg>
-            Home
-          </Link>
+          <div className="flex items-center gap-3">
+            <button onClick={() => setShowConfigModal(true)} className="btn btn-ghost text-white hover:bg-white/10">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              Settings
+            </button>
+            <button onClick={employeeLogout} className="btn btn-ghost text-white hover:bg-white/10">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              Logout
+            </button>
+          </div>
         </div>
       </header>
 
@@ -95,7 +221,7 @@ export default function EmployeePage() {
               </svg>
             </div>
             <div>
-              <p className="text-xs text-slate-500">Today&apos;s Appointments</p>
+              <p className="text-xs text-slate-500">Selected Day</p>
               <p className="text-xl font-bold text-primary-900">{todayAppointments}</p>
             </div>
           </div>
@@ -207,15 +333,11 @@ export default function EmployeePage() {
                             <span className="text-lg font-bold text-accent-600">{apt.time}</span>
                           </div>
                           <div>
-                            <p className="font-medium text-primary-900">{apt.name}</p>
-                            <p className="text-sm text-slate-500">{apt.email}</p>
-                            {apt.phone && <p className="text-sm text-slate-400">{apt.phone}</p>}
+                            <p className="font-medium text-primary-900">Secret ID: <span className="font-mono text-primary-600">{apt.secretId}</span></p>
+                            <p className="text-xs text-slate-400 font-mono mt-1">{apt.id}</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-3">
-                          <span className="text-xs font-mono text-slate-400 bg-slate-100 px-2 py-1 rounded">
-                            {apt.id}
-                          </span>
                           {confirmCancel === apt.id ? (
                             <div className="flex items-center gap-2">
                               <button
@@ -371,6 +493,52 @@ export default function EmployeePage() {
         </div>
       )}
 
+      {/* Slot Configuration Modal */}
+      {showConfigModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 animate-fade-in">
+          <div className="card p-6 w-full max-w-lg animate-scale-in max-h-[80vh] overflow-y-auto">
+            <h3 className="text-xl font-bold text-primary-900 mb-4">Slot Configuration</h3>
+            <p className="text-slate-600 mb-6">Set the number of available appointments per time slot for each weekday</p>
+            
+            <div className="space-y-4">
+              {slotConfig.filter(c => DEFAULT_OPENING_HOURS.find(oh => oh.dayOfWeek === c.dayOfWeek)?.isOpen).map(config => (
+                <div key={config.dayOfWeek} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                  <span className="font-medium text-primary-900">{getDayName(config.dayOfWeek)}</span>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => updateSlotConfig(config.dayOfWeek, Math.max(1, config.slotsPerTime - 1))}
+                      className="w-8 h-8 bg-white border border-slate-200 rounded-lg flex items-center justify-center hover:bg-slate-100 transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                      </svg>
+                    </button>
+                    <span className="w-12 text-center font-bold text-lg text-primary-900">{config.slotsPerTime}</span>
+                    <button
+                      onClick={() => updateSlotConfig(config.dayOfWeek, config.slotsPerTime + 1)}
+                      className="w-8 h-8 bg-white border border-slate-200 rounded-lg flex items-center justify-center hover:bg-slate-100 transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setShowConfigModal(false)}
+                className="btn btn-primary flex-1"
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Footer */}
       <footer className="bg-primary-900 text-primary-200 py-6 px-6">
         <div className="max-w-7xl mx-auto text-center text-sm">
@@ -380,4 +548,3 @@ export default function EmployeePage() {
     </div>
   );
 }
-

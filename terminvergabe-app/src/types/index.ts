@@ -2,9 +2,7 @@ export interface Appointment {
   id: string;
   date: string; // YYYY-MM-DD
   time: string; // HH:MM
-  name: string;
-  email: string;
-  phone?: string;
+  secretId: string; // User's secret identifier for managing appointments
   createdAt: string;
 }
 
@@ -38,4 +36,7 @@ export interface OpeningHours {
   afternoonEnd?: string;
 }
 
- 
+export interface SlotConfig {
+  dayOfWeek: number;
+  slotsPerTime: number;
+}

@@ -14,23 +14,17 @@ interface BookingFormProps {
 
 export default function BookingForm({ selectedDate, selectedTime, onSuccess, onBack }: BookingFormProps) {
   const { addAppointment } = useApp();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [errors, setErrors] = useState<{ name?: string; email?: string }>({});
+  const [secretId, setSecretId] = useState('');
+  const [errors, setErrors] = useState<{ secretId?: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validateForm = (): boolean => {
-    const newErrors: { name?: string; email?: string } = {};
+    const newErrors: { secretId?: string } = {};
 
-    if (!name.trim()) {
-      newErrors.name = 'Name is required';
-    }
-
-    if (!email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = 'Please enter a valid email address';
+    if (!secretId.trim()) {
+      newErrors.secretId = 'Secret ID is required';
+    } else if (secretId.trim().length < 3) {
+      newErrors.secretId = 'Secret ID must be at least 3 characters';
     }
 
     setErrors(newErrors);
@@ -50,9 +44,7 @@ export default function BookingForm({ selectedDate, selectedTime, onSuccess, onB
     const appointment = addAppointment({
       date: selectedDate,
       time: selectedTime,
-      name: name.trim(),
-      email: email.trim(),
-      phone: phone.trim() || undefined,
+      secretId: secretId.trim(),
     });
 
     setIsSubmitting(false);
@@ -70,7 +62,7 @@ export default function BookingForm({ selectedDate, selectedTime, onSuccess, onB
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
-        <h3 className="text-lg font-semibold text-primary-900">Your Details</h3>
+        <h3 className="text-lg font-semibold text-primary-900">Enter Your Secret ID</h3>
       </div>
 
       {/* Selected Date/Time Summary */}
@@ -88,56 +80,40 @@ export default function BookingForm({ selectedDate, selectedTime, onSuccess, onB
         </div>
       </div>
 
+      {/* Info Box */}
+      <div className="bg-primary-50 border border-primary-200 rounded-xl p-4 mb-6">
+        <div className="flex gap-3">
+          <svg className="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div className="text-sm text-primary-700">
+            <p className="font-medium mb-1">What is a Secret ID?</p>
+            <p>Choose any memorable phrase or code that you&apos;ll use to view and manage your appointments. Keep it private!</p>
+          </div>
+        </div>
+      </div>
+
       <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Name */}
+        {/* Secret ID */}
         <div>
-          <label htmlFor="name" className="label">
-            Full Name <span className="text-danger-500">*</span>
+          <label htmlFor="secretId" className="label">
+            Your Secret ID <span className="text-danger-500">*</span>
           </label>
           <input
             type="text"
-            id="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Enter your full name"
-            className={`input ${errors.name ? 'border-danger-500 focus:border-danger-500 focus:ring-danger-500/20' : ''}`}
+            id="secretId"
+            value={secretId}
+            onChange={(e) => setSecretId(e.target.value)}
+            placeholder="Enter a memorable secret code"
+            className={`input ${errors.secretId ? 'border-danger-500 focus:border-danger-500 focus:ring-danger-500/20' : ''}`}
+            autoComplete="off"
           />
-          {errors.name && (
-            <p className="text-danger-500 text-sm mt-1.5">{errors.name}</p>
+          {errors.secretId && (
+            <p className="text-danger-500 text-sm mt-1.5">{errors.secretId}</p>
           )}
-        </div>
-
-        {/* Email */}
-        <div>
-          <label htmlFor="email" className="label">
-            Email Address <span className="text-danger-500">*</span>
-          </label>
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="your.email@example.com"
-            className={`input ${errors.email ? 'border-danger-500 focus:border-danger-500 focus:ring-danger-500/20' : ''}`}
-          />
-          {errors.email && (
-            <p className="text-danger-500 text-sm mt-1.5">{errors.email}</p>
-          )}
-        </div>
-
-        {/* Phone (Optional) */}
-        <div>
-          <label htmlFor="phone" className="label">
-            Phone Number <span className="text-slate-400">(optional)</span>
-          </label>
-          <input
-            type="tel"
-            id="phone"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder="+49 123 456789"
-            className="input"
-          />
+          <p className="text-slate-500 text-xs mt-1.5">
+            Use this same ID later to view or cancel your appointments
+          </p>
         </div>
 
         {/* Submit */}
@@ -167,4 +143,3 @@ export default function BookingForm({ selectedDate, selectedTime, onSuccess, onB
     </div>
   );
 }
-

@@ -41,21 +41,42 @@ export default function Home() {
           </div>
 
           {/* Cards */}
-          <div className="grid md:grid-cols-2 gap-6 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+          <div className="grid md:grid-cols-3 gap-6 animate-slide-up" style={{ animationDelay: '0.1s' }}>
             {/* Citizen Card */}
             <Link href="/book" className="group">
               <div className="card p-8 h-full hover:shadow-xl hover:border-accent-300 transition-all duration-300 hover:-translate-y-1">
                 <div className="w-14 h-14 bg-accent-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-accent-500 group-hover:text-white transition-colors">
                   <svg className="w-7 h-7 text-accent-600 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                   </svg>
                 </div>
                 <h3 className="text-2xl font-semibold text-primary-900 mb-3">Book an Appointment</h3>
                 <p className="text-slate-600 mb-6">
-                  Citizens can schedule appointments online. Choose your preferred date and time from available slots.
+                  Schedule a new appointment online. Choose your preferred date and time from available slots.
                 </p>
                 <div className="flex items-center text-accent-600 font-medium group-hover:gap-3 gap-2 transition-all">
                   Start Booking
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </div>
+              </div>
+            </Link>
+
+            {/* My Appointments Card */}
+            <Link href="/my-appointments" className="group">
+              <div className="card p-8 h-full hover:shadow-xl hover:border-success-300 transition-all duration-300 hover:-translate-y-1">
+                <div className="w-14 h-14 bg-success-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-success-500 transition-colors">
+                  <svg className="w-7 h-7 text-success-600 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-semibold text-primary-900 mb-3">My Appointments</h3>
+                <p className="text-slate-600 mb-6">
+                  View and manage your existing appointments using your Secret ID.
+                </p>
+                <div className="flex items-center text-success-600 font-medium group-hover:gap-3 gap-2 transition-all">
+                  View Appointments
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                   </svg>
@@ -68,12 +89,12 @@ export default function Home() {
               <div className="card p-8 h-full hover:shadow-xl hover:border-primary-300 transition-all duration-300 hover:-translate-y-1">
                 <div className="w-14 h-14 bg-primary-100 rounded-xl flex items-center justify-center mb-6 group-hover:bg-primary-800 transition-colors">
                   <svg className="w-7 h-7 text-primary-700 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                   </svg>
                 </div>
                 <h3 className="text-2xl font-semibold text-primary-900 mb-3">Employee Dashboard</h3>
                 <p className="text-slate-600 mb-6">
-                  Staff access to view all appointments, manage bookings, and block time slots when needed.
+                  Staff access to view all appointments, manage bookings, and configure settings.
                 </p>
                 <div className="flex items-center text-primary-700 font-medium group-hover:gap-3 gap-2 transition-all">
                   Open Dashboard

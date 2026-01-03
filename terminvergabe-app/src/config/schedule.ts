@@ -1,10 +1,13 @@
-import { OpeningHours } from '@/types';
+import { OpeningHours, SlotConfig } from '@/types';
 
 // Default slot duration in minutes
 export const SLOT_DURATION = 30;
 
-// Number of available spots per time slot
-export const SLOTS_PER_TIME = 10;
+// Default number of available spots per time slot
+export const DEFAULT_SLOTS_PER_TIME = 10;
+
+// Employee password (in production, use environment variables)
+export const EMPLOYEE_PASSWORD = 'admin123pc';
 
 // Default opening hours (can be modified later)
 export const DEFAULT_OPENING_HOURS: OpeningHours[] = [
@@ -15,6 +18,17 @@ export const DEFAULT_OPENING_HOURS: OpeningHours[] = [
   { dayOfWeek: 4, isOpen: true, morningStart: '08:00', morningEnd: '12:00', afternoonStart: '13:00', afternoonEnd: '16:00' }, // Thursday
   { dayOfWeek: 5, isOpen: true, morningStart: '08:00', morningEnd: '12:00', afternoonStart: '13:00', afternoonEnd: '14:00' }, // Friday (shorter)
   { dayOfWeek: 6, isOpen: false }, // Saturday
+];
+
+// Default slots per day
+export const DEFAULT_SLOT_CONFIG: SlotConfig[] = [
+  { dayOfWeek: 0, slotsPerTime: DEFAULT_SLOTS_PER_TIME },
+  { dayOfWeek: 1, slotsPerTime: DEFAULT_SLOTS_PER_TIME },
+  { dayOfWeek: 2, slotsPerTime: DEFAULT_SLOTS_PER_TIME },
+  { dayOfWeek: 3, slotsPerTime: DEFAULT_SLOTS_PER_TIME },
+  { dayOfWeek: 4, slotsPerTime: DEFAULT_SLOTS_PER_TIME },
+  { dayOfWeek: 5, slotsPerTime: DEFAULT_SLOTS_PER_TIME },
+  { dayOfWeek: 6, slotsPerTime: DEFAULT_SLOTS_PER_TIME },
 ];
 
 // Generate time slots for a given day
@@ -80,4 +94,3 @@ export function getNextDays(count: number): string[] {
   
   return dates;
 }
-

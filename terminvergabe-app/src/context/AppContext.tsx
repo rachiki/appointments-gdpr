@@ -1,26 +1,34 @@
 'use client';
 
 import React, { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
-import { Appointment, BlockedSlot, TimeSlot } from '@/types';
-import { DEFAULT_OPENING_HOURS, SLOTS_PER_TIME, generateTimeSlots } from '@/config/schedule';
+import { Appointment, BlockedSlot, TimeSlot, SlotConfig } from '@/types';
+import { DEFAULT_OPENING_HOURS, DEFAULT_SLOT_CONFIG, generateTimeSlots, EMPLOYEE_PASSWORD } from '@/config/schedule';
 
 const STORAGE_KEYS = {
   APPOINTMENTS: 'terminvergabe_appointments',
   BLOCKED_SLOTS: 'terminvergabe_blocked_slots',
+  SLOT_CONFIG: 'terminvergabe_slot_config',
+  EMPLOYEE_LOGGED_IN: 'terminvergabe_employee_logged_in',
 };
 
 interface AppContextType {
   appointments: Appointment[];
   blockedSlots: BlockedSlot[];
-  slotsPerTime: number;
+  slotConfig: SlotConfig[];
   isLoaded: boolean;
+  isEmployeeLoggedIn: boolean;
   addAppointment: (appointment: Omit<Appointment, 'id' | 'createdAt'>) => Appointment;
   cancelAppointment: (id: string) => void;
   blockSlot: (date: string, time: string, reason?: string) => void;
   unblockSlot: (id: string) => void;
   getAvailableSlots: (date: string) => TimeSlot[];
   getAppointmentsForDate: (date: string) => Appointment[];
+  getAppointmentsBySecretId: (secretId: string) => Appointment[];
   isDateOpen: (date: string) => boolean;
+  employeeLogin: (password: string) => boolean;
+  employeeLogout: () => void;
+  updateSlotConfig: (dayOfWeek: number, slotsPerTime: number) => void;
+  getSlotsPerTime: (dayOfWeek: number) => number;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -58,16 +66,21 @@ function saveToStorage<T>(key: string, value: T): void {
 export function AppProvider({ children }: { children: ReactNode }) {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [blockedSlots, setBlockedSlots] = useState<BlockedSlot[]>([]);
+  const [slotConfig, setSlotConfig] = useState<SlotConfig[]>(DEFAULT_SLOT_CONFIG);
   const [isLoaded, setIsLoaded] = useState(false);
-  const slotsPerTime = SLOTS_PER_TIME;
+  const [isEmployeeLoggedIn, setIsEmployeeLoggedIn] = useState(false);
 
   // Load from localStorage on mount
   useEffect(() => {
     const storedAppointments = loadFromStorage<Appointment[]>(STORAGE_KEYS.APPOINTMENTS, []);
     const storedBlockedSlots = loadFromStorage<BlockedSlot[]>(STORAGE_KEYS.BLOCKED_SLOTS, []);
+    const storedSlotConfig = loadFromStorage<SlotConfig[]>(STORAGE_KEYS.SLOT_CONFIG, DEFAULT_SLOT_CONFIG);
+    const storedEmployeeLoggedIn = loadFromStorage<boolean>(STORAGE_KEYS.EMPLOYEE_LOGGED_IN, false);
     
     setAppointments(storedAppointments);
     setBlockedSlots(storedBlockedSlots);
+    setSlotConfig(storedSlotConfig);
+    setIsEmployeeLoggedIn(storedEmployeeLoggedIn);
     setIsLoaded(true);
   }, []);
 
@@ -84,6 +97,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
       saveToStorage(STORAGE_KEYS.BLOCKED_SLOTS, blockedSlots);
     }
   }, [blockedSlots, isLoaded]);
+
+  // Save slot config to localStorage whenever it changes
+  useEffect(() => {
+    if (isLoaded) {
+      saveToStorage(STORAGE_KEYS.SLOT_CONFIG, slotConfig);
+    }
+  }, [slotConfig, isLoaded]);
+
+  // Save employee login status
+  useEffect(() => {
+    if (isLoaded) {
+      saveToStorage(STORAGE_KEYS.EMPLOYEE_LOGGED_IN, isEmployeeLoggedIn);
+    }
+  }, [isEmployeeLoggedIn, isLoaded]);
 
   const addAppointment = useCallback((appointmentData: Omit<Appointment, 'id' | 'createdAt'>): Appointment => {
     const newAppointment: Appointment = {
@@ -120,6 +147,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return openingHours?.isOpen ?? false;
   }, []);
 
+  const getSlotsPerTime = useCallback((dayOfWeek: number): number => {
+    const config = slotConfig.find(c => c.dayOfWeek === dayOfWeek);
+    return config?.slotsPerTime ?? 10;
+  }, [slotConfig]);
+
   const getAvailableSlots = useCallback((dateString: string): TimeSlot[] => {
     const date = new Date(dateString);
     const dayOfWeek = date.getDay();
@@ -129,6 +161,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       return [];
     }
 
+    const slotsPerTime = getSlotsPerTime(dayOfWeek);
     const timeStrings = generateTimeSlots(openingHours);
     const dateAppointments = appointments.filter(apt => apt.date === dateString);
     const dateBlockedSlots = blockedSlots.filter(slot => slot.date === dateString);
@@ -144,26 +177,57 @@ export function AppProvider({ children }: { children: ReactNode }) {
         blocked: isBlocked,
       };
     });
-  }, [appointments, blockedSlots, slotsPerTime]);
+  }, [appointments, blockedSlots, getSlotsPerTime]);
 
   const getAppointmentsForDate = useCallback((date: string): Appointment[] => {
     return appointments.filter(apt => apt.date === date).sort((a, b) => a.time.localeCompare(b.time));
   }, [appointments]);
+
+  const getAppointmentsBySecretId = useCallback((secretId: string): Appointment[] => {
+    return appointments.filter(apt => apt.secretId.toLowerCase() === secretId.toLowerCase())
+      .sort((a, b) => `${a.date}${a.time}`.localeCompare(`${b.date}${b.time}`));
+  }, [appointments]);
+
+  const employeeLogin = useCallback((password: string): boolean => {
+    if (password === EMPLOYEE_PASSWORD) {
+      setIsEmployeeLoggedIn(true);
+      return true;
+    }
+    return false;
+  }, []);
+
+  const employeeLogout = useCallback(() => {
+    setIsEmployeeLoggedIn(false);
+  }, []);
+
+  const updateSlotConfig = useCallback((dayOfWeek: number, slotsPerTime: number) => {
+    setSlotConfig(prev => prev.map(config => 
+      config.dayOfWeek === dayOfWeek 
+        ? { ...config, slotsPerTime } 
+        : config
+    ));
+  }, []);
 
   return (
     <AppContext.Provider
       value={{
         appointments,
         blockedSlots,
-        slotsPerTime,
+        slotConfig,
         isLoaded,
+        isEmployeeLoggedIn,
         addAppointment,
         cancelAppointment,
         blockSlot,
         unblockSlot,
         getAvailableSlots,
         getAppointmentsForDate,
+        getAppointmentsBySecretId,
         isDateOpen,
+        employeeLogin,
+        employeeLogout,
+        updateSlotConfig,
+        getSlotsPerTime,
       }}
     >
       {children}
