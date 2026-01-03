@@ -184,7 +184,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [appointments]);
 
   const getAppointmentsBySecretId = useCallback((secretId: string): Appointment[] => {
-    return appointments.filter(apt => apt.secretId.toLowerCase() === secretId.toLowerCase())
+    return appointments.filter(apt => apt.secretId?.toLowerCase() === secretId.toLowerCase())
       .sort((a, b) => `${a.date}${a.time}`.localeCompare(`${b.date}${b.time}`));
   }, [appointments]);
 
