@@ -2,7 +2,7 @@
 
 import { useApp } from '@/context/AppContext';
 import { useLanguage } from '@/context/LanguageContext';
-import { formatDate } from '@/config/schedule';
+import { formatDate, parseLocalDate } from '@/config/schedule';
 import { TimeSlot } from '@/types';
 
 interface TimeSlotPickerProps {
@@ -16,7 +16,7 @@ export default function TimeSlotPicker({ selectedDate, selectedTime, onSelectTim
   const { t, language } = useLanguage();
   const slots = getAvailableSlots(selectedDate);
   
-  const date = new Date(selectedDate);
+  const date = parseLocalDate(selectedDate);
   const dayOfWeek = date.getDay();
   const slotsPerTime = getSlotsPerTime(dayOfWeek);
 

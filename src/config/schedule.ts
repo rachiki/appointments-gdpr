@@ -74,9 +74,15 @@ export function getDayName(dayOfWeek: number, language: Language = 'de'): string
   return days[language][dayOfWeek];
 }
 
+// Parse date string to local Date (avoids timezone issues)
+export function parseLocalDate(dateString: string): Date {
+  const [year, month, day] = dateString.split('-').map(Number);
+  return new Date(year, month - 1, day);
+}
+
 // Format date for display
 export function formatDate(dateString: string, language: Language = 'de'): string {
-  const date = new Date(dateString);
+  const date = parseLocalDate(dateString);
   const locale = language === 'de' ? 'de-DE' : 'en-US';
   return date.toLocaleDateString(locale, {
     weekday: 'long',

@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useApp } from '@/context/AppContext';
 import { useLanguage } from '@/context/LanguageContext';
-import { formatDate, getNextDays, DEFAULT_OPENING_HOURS, generateTimeSlots, getDayName } from '@/config/schedule';
+import { formatDate, getNextDays, DEFAULT_OPENING_HOURS, generateTimeSlots, getDayName, parseLocalDate } from '@/config/schedule';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export default function EmployeePage() {
@@ -34,6 +34,7 @@ export default function EmployeePage() {
   const [showBlockModal, setShowBlockModal] = useState(false);
   const [showConfigModal, setShowConfigModal] = useState(false);
   const [blockTime, setBlockTime] = useState('');
+  const [blockCount, setBlockCount] = useState(1);
   const [blockReason, setBlockReason] = useState('');
   const [confirmCancel, setConfirmCancel] = useState<string | null>(null);
 
@@ -60,11 +61,18 @@ export default function EmployeePage() {
   const availableSlots = useMemo(() => getAvailableSlots(selectedDate), [getAvailableSlots, selectedDate]);
 
   const getAllTimeSlots = () => {
-    const date = new Date(selectedDate);
+    const date = parseLocalDate(selectedDate);
     const dayOfWeek = date.getDay();
     const openingHours = DEFAULT_OPENING_HOURS.find(oh => oh.dayOfWeek === dayOfWeek);
     if (!openingHours) return [];
     return generateTimeSlots(openingHours);
+  };
+
+  const getMaxBlockableSlots = () => {
+    const date = parseLocalDate(selectedDate);
+    const dayOfWeek = date.getDay();
+    const config = slotConfig.find(c => c.dayOfWeek === dayOfWeek);
+    return config?.slotsPerTime ?? 10;
   };
 
   const handleLogin = (e: React.FormEvent) => {
@@ -79,9 +87,10 @@ export default function EmployeePage() {
 
   const handleBlockSlot = () => {
     if (!blockTime) return;
-    blockSlot(selectedDate, blockTime, blockReason || undefined);
+    blockSlot(selectedDate, blockTime, blockCount, blockReason || undefined);
     setShowBlockModal(false);
     setBlockTime('');
+    setBlockCount(1);
     setBlockReason('');
   };
 
@@ -390,7 +399,9 @@ export default function EmployeePage() {
                             <span className="text-lg font-bold text-danger-600">{slot.time}</span>
                           </div>
                           <div>
-                            <p className="font-medium text-danger-700">{t('blocked')}</p>
+                            <p className="font-medium text-danger-700">
+                              {t('blocked')} ({slot.count} {slot.count === 1 ? t('slot') : t('slots')})
+                            </p>
                             {slot.reason && <p className="text-sm text-danger-500">{slot.reason}</p>}
                           </div>
                         </div>
@@ -466,6 +477,32 @@ export default function EmployeePage() {
                     ))
                   }
                 </select>
+              </div>
+              <div>
+                <label className="label">{t('numberOfSlotsToBlock')}</label>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setBlockCount(Math.max(1, blockCount - 1))}
+                    className="w-10 h-10 bg-slate-100 border border-slate-200 rounded-lg flex items-center justify-center hover:bg-slate-200 transition-colors"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                    </svg>
+                  </button>
+                  <span className="w-16 text-center font-bold text-xl text-primary-900">{blockCount}</span>
+                  <button
+                    type="button"
+                    onClick={() => setBlockCount(Math.min(getMaxBlockableSlots(), blockCount + 1))}
+                    className="w-10 h-10 bg-slate-100 border border-slate-200 rounded-lg flex items-center justify-center hover:bg-slate-200 transition-colors"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                  </button>
+                  <span className="text-sm text-slate-500">/ {getMaxBlockableSlots()} {t('maxSlots')}</span>
+                </div>
+                <p className="text-xs text-slate-500 mt-1">{t('blockCountHint')}</p>
               </div>
               <div>
                 <label className="label">{t('reasonOptional')}</label>

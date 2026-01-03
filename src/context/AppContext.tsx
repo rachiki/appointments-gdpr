@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
 import { Appointment, BlockedSlot, TimeSlot, SlotConfig } from '@/types';
-import { DEFAULT_OPENING_HOURS, DEFAULT_SLOT_CONFIG, generateTimeSlots, EMPLOYEE_PASSWORD } from '@/config/schedule';
+import { DEFAULT_OPENING_HOURS, DEFAULT_SLOT_CONFIG, generateTimeSlots, EMPLOYEE_PASSWORD, parseLocalDate } from '@/config/schedule';
 
 const STORAGE_KEYS = {
   APPOINTMENTS: 'terminvergabe_appointments',
@@ -19,7 +19,7 @@ interface AppContextType {
   isEmployeeLoggedIn: boolean;
   addAppointment: (appointment: Omit<Appointment, 'id' | 'createdAt'>) => Appointment;
   cancelAppointment: (id: string) => void;
-  blockSlot: (date: string, time: string, reason?: string) => void;
+  blockSlot: (date: string, time: string, count: number, reason?: string) => void;
   unblockSlot: (id: string) => void;
   getAvailableSlots: (date: string) => TimeSlot[];
   getAppointmentsForDate: (date: string) => Appointment[];
@@ -126,12 +126,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setAppointments(prev => prev.filter(apt => apt.id !== id));
   }, []);
 
-  const blockSlot = useCallback((date: string, time: string, reason?: string) => {
+  const blockSlot = useCallback((date: string, time: string, count: number, reason?: string) => {
     const newBlockedSlot: BlockedSlot = {
       id: generateId(),
       date,
       time,
       reason,
+      count,
     };
     setBlockedSlots(prev => [...prev, newBlockedSlot]);
   }, []);
@@ -141,7 +142,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const isDateOpen = useCallback((dateString: string): boolean => {
-    const date = new Date(dateString);
+    const date = parseLocalDate(dateString);
     const dayOfWeek = date.getDay();
     const openingHours = DEFAULT_OPENING_HOURS.find(oh => oh.dayOfWeek === dayOfWeek);
     return openingHours?.isOpen ?? false;
@@ -153,7 +154,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [slotConfig]);
 
   const getAvailableSlots = useCallback((dateString: string): TimeSlot[] => {
-    const date = new Date(dateString);
+    const date = parseLocalDate(dateString);
     const dayOfWeek = date.getDay();
     const openingHours = DEFAULT_OPENING_HOURS.find(oh => oh.dayOfWeek === dayOfWeek);
 
@@ -168,13 +169,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
     return timeStrings.map(time => {
       const bookedCount = dateAppointments.filter(apt => apt.time === time).length;
-      const isBlocked = dateBlockedSlots.some(slot => slot.time === time);
+      const blockedSlot = dateBlockedSlots.find(slot => slot.time === time);
+      // Sum up blocked count - if count equals or exceeds slotsPerTime, it's fully blocked
+      const blockedCount = blockedSlot?.count ?? 0;
+      const isFullyBlocked = blockedCount >= slotsPerTime;
 
       return {
         time,
-        available: isBlocked ? 0 : Math.max(0, slotsPerTime - bookedCount),
+        available: isFullyBlocked ? 0 : Math.max(0, slotsPerTime - bookedCount - blockedCount),
         booked: bookedCount,
-        blocked: isBlocked,
+        blocked: isFullyBlocked,
       };
     });
   }, [appointments, blockedSlots, getSlotsPerTime]);

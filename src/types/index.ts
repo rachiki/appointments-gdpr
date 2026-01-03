@@ -11,6 +11,7 @@ export interface BlockedSlot {
   date: string; // YYYY-MM-DD
   time: string; // HH:MM
   reason?: string;
+  count: number; // How many slots to block (default: all available)
 }
 
 export interface TimeSlot {

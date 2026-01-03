@@ -145,6 +145,11 @@ export const translations = {
     slotConfiguration: 'Slot Configuration',
     slotConfigDescription: 'Set the number of available appointments per time slot for each weekday',
     employeePortal: 'Employee Portal.',
+    numberOfSlotsToBlock: 'Number of slots to block',
+    maxSlots: 'max',
+    blockCountHint: 'Set how many booking slots should be blocked for this time',
+    slot: 'slot',
+    slots: 'slots',
 
     // Weekdays
     monday: 'Monday',
@@ -308,6 +313,11 @@ export const translations = {
     slotConfiguration: 'Slot-Konfiguration',
     slotConfigDescription: 'Legen Sie die Anzahl der verfügbaren Termine pro Zeitslot für jeden Wochentag fest',
     employeePortal: 'Mitarbeiter-Portal.',
+    numberOfSlotsToBlock: 'Anzahl der zu sperrenden Slots',
+    maxSlots: 'max',
+    blockCountHint: 'Legen Sie fest, wie viele Buchungsslots für diese Zeit gesperrt werden sollen',
+    slot: 'Slot',
+    slots: 'Slots',
 
     // Weekdays
     monday: 'Montag',
